@@ -39,16 +39,17 @@ end -- function IAaddCures()
 -- remove worker specialization and optionally fire worker
 local function IAremoveSpecialization(unit, fireworker, firedOfficers)
   local specialization = unit.specialist
-	if specialization == "none" then return end -- short circuit if already not trained.
+  local workplace = unit.workplace
 
-	local workplace = unit.workplace
-	unit.city:RemoveFromLabel(unit.specialist, unit)
-	unit:RemoveTrait(unit.specialist)
-	unit.specialist = "none"
-	unit.traits.none = true
-  unit:ChooseEntity()
-  unit.city:AddToLabel(unit.specialist, unit)
-  Msg("NewSpecialist", unit)
+	if specialization == "security" then
+  	unit.city:RemoveFromLabel(unit.specialist, unit)
+	  unit:RemoveTrait(unit.specialist)
+	  unit.specialist = "none"
+	  unit.traits.none = true
+    unit:ChooseEntity()
+    unit.city:AddToLabel(unit.specialist, unit)
+    Msg("NewSpecialist", unit)
+  end -- if specialization
 
   local IAmsg = T{StringIdBase + 3, "Internal affairs found renegade officers"}
   if not firedOfficers then
