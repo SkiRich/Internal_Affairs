@@ -43,3 +43,15 @@ end -- OnMsg.CityStart()
 function OnMsg.LoadGame()
 	IAaddCures()
 end -- OnMsg.LoadGame()
+
+function OnMsg.ClassesGenerate()
+
+  local Old_MartianUniversity_CanTrain = MartianUniversity.CanTrain
+  function MartianUniversity:CanTrain(unit)
+    if unit.traits.Renegade then return end -- Renegade cannot train in Martian University
+
+    print("Test from IA")
+	  return Old_MartianUniversity_CanTrain(self, unit)
+  end --MartianUniversity:CanTrain(unit)
+
+end -- OnMsg.ClassesGenerate()
