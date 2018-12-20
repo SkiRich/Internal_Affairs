@@ -8,8 +8,12 @@
 local lf_print = true -- Setup debug printing in local file
                        -- Use if lf_print then print("something") end
 
+local StringIdBase = 17764701200 -- Deposit Auto Refill  : 701200 - 701299 next: 5
 local ModDir = CurrentModPath
 local iconIAnotice = ModDir.."UI/Icons/NoticeIconBlank.png"
+
+
+g_IAnoticeDismissTime = 15000 -- Notice dismiss time in msecs
 
 
 -- adds additional traits to Sanatorium for curing
@@ -32,16 +36,55 @@ local function IAaddCures()
 	end -- if not found
 end -- function IAaddCures()
 
+-- remove worker specialization and optionally fire worker
+local function IAremoveSpecialization(unit, fireworker, firedOfficers)
+  local specialization = unit.specialist
+	if specialization == "none" then return end -- short circuit if already not trained.
+
+	local workplace = unit.workplace
+	unit.city:RemoveFromLabel(unit.specialist, unit)
+	unit:RemoveTrait(unit.specialist)
+	unit.specialist = "none"
+	unit.traits.none = true
+  unit:ChooseEntity()
+  unit.city:AddToLabel(unit.specialist, unit)
+  Msg("NewSpecialist", unit)
+
+  local IAmsg = T{StringIdBase + 3, "Internal affairs found renegade officers"}
+  if not firedOfficers then
+  	firedOfficers = {}
+  	table.insert(firedOfficers, unit)
+  end -- if not firedOfficers
+  AddCustomOnScreenNotification("IA_IANotice", T{StringIdBase + 4, "Internal Affairs"}, IAmsg, iconIAnotice, nil, {cycle_objs = firedOfficers, expiration = g_IAnoticeDismissTime})
+	PlayFX("UINotificationResearchComplete", unit)
+
+  if fireworker and workplace then workplace:FireWorker(unit) end
+end -- IAremoveSpecialization(unit)
 
 -- Internal affairs function called during night shift
 function IAexecuteInvestigation()
 	local secStations = UICity.labels.SecurityStation or empty_table
 	local workingStation = false
+	local fireworker = true
+	local firedOfficers = {}
+
 	for i = 1, #secStations do
 		if secStations[i].working then workingStation = true end
 	end -- for i
 
 	if workingStation then
+	  for i = 1, #secStations do
+	  	local workshifts = secStations[i].workers
+      for j = 1, #workshifts do
+      	local workers = workshifts[j]
+     		for k = 1, #workers do
+     			if workers[k].traits.Renegade then
+     				table.insert(firedOfficers, workers[k])
+     				IAremoveSpecialization(workers[k], fireworker, firedOfficers)
+     			end -- if renegade
+      	end -- for k
+      end -- for k
+	  end -- for i
 	end -- if workingStation
 
 end -- IAexecuteInvestigation()
@@ -56,6 +99,10 @@ end -- OnMsg.CityStart()
 function OnMsg.LoadGame()
 	IAaddCures()
 end -- OnMsg.LoadGame()
+
+function OnMsg.NewDay()
+	IAexecuteInvestigation()
+end -- OnMsg.NewDay()
 
 function OnMsg.ClassesGenerate()
 
@@ -74,8 +121,8 @@ function OnMsg.ClassesGenerate()
   	-- cannot cure renegade children
   	if unit.traits.Renegade and not TrainingBuilding.CanTrain(self, unit) then return false end
 
-   -- cannot cure officer renegades
-   if unit.traits.Renegade and unit.specialist = "security" then return false end
+   -- cannot cure officer renegades working at a security station
+   if unit.traits.Renegade and unit.specialist == "security" and IsKindOf(unit.workplace, "SecurityStation") then return false end
 
   	local cTraits = unit.traits
   	local canCureRenegade = false
@@ -97,8 +144,15 @@ function OnMsg.ClassesGenerate()
     	end -- if #secStations
 
     	if parolOfficerAvailable then
-    	  if lf_print then print("PO Available Curing renegade") end
-    	  unit.IA_PO = true
+        if not unit.IA_PO then
+        	local colonistname = _InternalTranslate(unit.name)
+        	local IAmsg = T{StringIdBase + 1, "Officer assigned to: <colonistname>", colonistname = colonistname}
+          AddCustomOnScreenNotification("IA_PONotice", T{StringIdBase + 2, "Parole Officer Assigned"}, IAmsg, iconIAnotice, nil, {cycle_objs = {unit}, expiration = g_IAnoticeDismissTime})
+	        PlayFX("UINotificationResearchComplete", self)
+	      end -- if not unit.IA_PO
+	      if lf_print and not unit.IA_PO then print("PO Available Curing renegade") end
+	      if unit.specialist == "security" then IAremoveSpecialization(unit) end
+	      unit.IA_PO = true
     	  return true
     	else
     	  if lf_print then print("PO NOT Available cannot cure renegade") end
