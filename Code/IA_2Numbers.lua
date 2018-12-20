@@ -1,9 +1,9 @@
 -- Code developed for Internal Affairs
 -- This code file supplied by Choggi
 -- Mod Author @SkiRich
--- All rights reserved, duplication and modification prohibited of this mod except this for this file
+-- All rights reserved, duplication and modification prohibited of this mod except for this file
 -- You may not copy this mod, package this mod, or claim this mod as your own.
--- You may use or copy this file (IA_2_Numbers.lua) under the MIT license terms
+-- You may use or copy this file and supporting number png files (IA_2_Numbers.lua) under the MIT license terms
 -- Created Dec 19th, 2018
 -- Updated Dec 19th, 2018
 
