@@ -10,7 +10,7 @@ local lf_print = false -- Setup debug printing in local file
 
 local StringIdBase = 17764701200 -- Deposit Auto Refill  : 701200 - 701299 this file 50-99 next:
 
-local steam_id = "0"
+local steam_id = "1596642938"
 local mod_name = "Internal Affairs"
 
 -- Variable replacement for mod config steam id for check.
