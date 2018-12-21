@@ -11,7 +11,8 @@ local lf_print = true -- Setup debug printing in local file
 local StringIdBase = 17764701200 -- Deposit Auto Refill  : 701200 - 701299 next: 5
 local ModDir = CurrentModPath
 local iconIAnotice = ModDir.."UI/Icons/IANotice.png"
-
+local IAtraitParolee       = "Parolee"
+local IAtraitFormerOfficer = "Former_Officer"
 
 g_IAnoticeDismissTime = 15000 -- Notice dismiss time in msecs
 
@@ -37,6 +38,49 @@ local function IAaddCures()
 end -- function IAaddCures()
 
 
+-- add the IA traits to the game for tracking colonists
+local function IAaddTraits()
+	local PlaceObj = PlaceObj
+	local TraitPresets = TraitPresets
+
+	-- dont spread these traits via guru
+	GuruTraitBlacklist[IAtraitParolee] = true
+	GuruTraitBlacklist[IAtraitFormerOfficer] = true
+
+
+	-- Traits to add to renegades when caught
+	if not TraitPresets[IAtraitParolee] then
+		TraitPresets[IAtraitParolee] = PlaceObj('TraitPreset', {
+	    auto = false,
+	    description = T(707913043851, --[[TraitPreset Parolee description]] "Current or former renegade with an assigned Parole Officer"),
+	    display_name = T(886150448885, --[[TraitPreset Parolee display_name]] "Parolee"),
+	    dome_filter_only = true,
+	    group = "other",
+	    rare = false,
+	    show_in_traits_ui = true,
+	    hidden_on_start = true,
+	    id = IAtraitParolee,
+    })
+	end -- if not IAtraitParolee
+
+	-- Traits to add to renegades when officer is caught
+	if not TraitPresets[IAtraitFormerOfficer] then
+		TraitPresets[IAtraitFormerOfficer] = PlaceObj('TraitPreset', {
+	    auto = false,
+	    description = T(353743420409, --[[ModItemTraitPreset Former_Officer description]] "Renegade officer that had their badge taken away in the past"),
+	    display_name = T(819754623356, --[[ModItemTraitPreset Former_Officer display_name]] "Former Officer"),
+	    dome_filter_only = true,
+	    group = "other",
+	    rare = false,
+	    show_in_traits_ui = true,
+	    hidden_on_start = true,
+	    id = IAtraitFormerOfficer,
+	  })
+  end -- if not IAtraitFormerOfficer
+
+end -- IAaddTraits()
+
+
 -- remove worker specialization and optionally fire worker
 -- unit          : colonist object, required
 -- fireworker    : boolean, optional, if true fire worker from job
@@ -48,7 +92,8 @@ local function IAremoveSpecialization(unit, fireworker, firedOfficers)
   -- only remove the specialty of a security officer
 	if specialization == "security" then
   	unit.city:RemoveFromLabel(unit.specialist, unit)
-	  unit:RemoveTrait(unit.specialist)
+	  unit:RemoveTrait(unit.specialist) -- strip the badge
+	  unit:AddTrait(IAtraitFormerOfficer) -- add former officer trait
 	  unit.specialist = "none"
 	  unit.traits.none = true
     unit:ChooseEntity()
@@ -110,13 +155,21 @@ function OnMsg.CityStart()
 	IAaddCures()
 end -- OnMsg.CityStart()
 
+
 function OnMsg.LoadGame()
 	IAaddCures()
 end -- OnMsg.LoadGame()
 
+
 function OnMsg.NewDay()
 	IAexecuteInvestigation()
 end -- OnMsg.NewDay()
+
+
+function OnMsg.ClassesPostprocess()
+	IAaddTraits()
+end -- OnMsg.ClassesPostprocess()
+
 
 function OnMsg.ClassesGenerate()
 
@@ -158,6 +211,8 @@ function OnMsg.ClassesGenerate()
     	end -- if #secStations
 
     	if parolOfficerAvailable then
+    		if not unit.traits[IAtraitParolee] then unit:AddTrait(IAtraitParolee) end -- add the parolee trait
+
         if not unit.IA_PO then
         	local colonistname = _InternalTranslate(unit.name)
         	local IAmsg = T{StringIdBase + 1, "Officer assigned to: <colonistname>", colonistname = colonistname}
