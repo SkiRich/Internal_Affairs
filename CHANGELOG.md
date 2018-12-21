@@ -1,4 +1,15 @@
 # Changelog for Internal Affairs
+## 1.0 12/21/2018 2:41:56 AM
+#### Changed
+- minor code tweeks
+
+#### Added
+- added two traits for tracking purposes - Parolee and Former_Officer
+- Comfort and Sanity hits for parolee
+- checks for worker still in workshift during IAinvestigations
+- added mod config options for notifications
+
+--------------------------------------------------------
 ## v0.03 12/20/2018 8:21:11 PM
 #### Changed
 - Tweaked code for fireing workers

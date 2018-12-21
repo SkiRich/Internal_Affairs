@@ -3,7 +3,7 @@
 -- All rights reserved, duplication and modification prohibited.
 -- You may not copy it, package it, or claim it as your own.
 -- Created Dec 17th, 2018
--- Updated Dec 20th, 2018
+-- Updated Dec 21th, 2018
 
 local lf_print = false -- Setup debug printing in local file
                        -- Use if lf_print then print("something") end
@@ -132,11 +132,11 @@ local function IAexecuteInvestigation()
 
 	if workingStation then
 	  for i = 1, #secStations do -- for each Station
-	  	local workshifts = secStations[i].workers
+	  	local workshifts = secStations[i].workers or empty_table
       for j = 1, #workshifts do -- for each workshift in each station
-      	local workers = workshifts[j]
+      	local workers = workshifts[j] or empty_table
      		for k = 1, #workers do -- for each worker in each workshift in each station
-     			if workers[k].traits.Renegade then
+     			if workers[k] and workers[k].traits.Renegade then -- check for nil in case worker leaves shift.
             -- if worker is a renegade, track for notice and execute remove/fire code
      				table.insert(firedOfficers, workers[k])
      				IAremoveSpecialization(workers[k], fireworker, firedOfficers)
@@ -212,12 +212,20 @@ function OnMsg.ClassesGenerate()
     	if parolOfficerAvailable then
     		if not unit.traits[IAtraitParolee] then unit:AddTrait(IAtraitParolee) end -- add the parolee trait
 
+        -- assigne PO trait
         if not unit.IA_PO then
+    		  -- take comfort and sanity hits just once per PO assignment
+          local sanity  = unit:GetSanity() * const.Scale.Stat
+          local comfort = unit:GetComfort() * const.Scale.Stat
+          unit:ChangeSanity(MulDivRound(-1, sanity, 4), T(StringIdBase + 5, "Criminal parolee "))
+          unit:ChangeComfort(MulDivRound(-1, comfort, 2), T(StringIdBase + 5, "Criminal parolee "))
+
         	local colonistname = _InternalTranslate(unit.name)
         	local IAmsg = T{StringIdBase + 1, "Officer assigned to: <colonistname>", colonistname = colonistname}
           AddCustomOnScreenNotification("IA_PONotice", T{StringIdBase + 2, "Parole Officer Assigned"}, IAmsg, iconIAnotice, nil, {cycle_objs = {unit}, expiration = g_IAnoticeDismissTime})
 	        PlayFX("UINotificationResearchComplete", self)
 	      end -- if not unit.IA_PO
+
 	      if lf_print and not unit.IA_PO then print("PO Available Curing renegade") end
 	      if unit.specialist == "security" then IAremoveSpecialization(unit) end -- if officer working at other job just remove badge
 	      unit.IA_PO = true
