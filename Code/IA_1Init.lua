@@ -5,10 +5,10 @@
 -- Created Dec 17th, 2018
 -- Updated Dec 20th, 2018
 
-local lf_print = true -- Setup debug printing in local file
+local lf_print = false -- Setup debug printing in local file
                        -- Use if lf_print then print("something") end
 
-local StringIdBase = 17764701200 -- Deposit Auto Refill  : 701200 - 701299 next: 5
+local StringIdBase = 17764701200 -- Deposit Auto Refill  : 701200 - 701299 this file 0-49 next: 5
 local ModDir = CurrentModPath
 local iconIAnotice = ModDir.."UI/Icons/IANotice.png"
 local IAtraitParolee       = "Parolee"
@@ -191,10 +191,9 @@ function OnMsg.ClassesGenerate()
    -- cannot cure officer renegades working at a security station
    if unit.traits.Renegade and unit.specialist == "security" and IsKindOf(unit.workplace, "SecurityStation") then return false end
 
-  	local cTraits = unit.traits
   	local canCureRenegade = false
     for k = 1, self.max_traits do
-      if cTraits[self["trait" .. k]] then canCureRenegade = true end
+      if self["trait" .. k] == "Renegade" then canCureRenegade = true end
     end -- for k
 
     if unit.traits.Renegade and canCureRenegade then
@@ -220,7 +219,7 @@ function OnMsg.ClassesGenerate()
 	        PlayFX("UINotificationResearchComplete", self)
 	      end -- if not unit.IA_PO
 	      if lf_print and not unit.IA_PO then print("PO Available Curing renegade") end
-	      if unit.specialist == "security" then IAremoveSpecialization(unit) end
+	      if unit.specialist == "security" then IAremoveSpecialization(unit) end -- if officer working at other job just remove badge
 	      unit.IA_PO = true
     	  return true
     	else
