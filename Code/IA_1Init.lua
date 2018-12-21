@@ -3,14 +3,14 @@
 -- All rights reserved, duplication and modification prohibited.
 -- You may not copy it, package it, or claim it as your own.
 -- Created Dec 17th, 2018
--- Updated Dec 17th, 2018
+-- Updated Dec 20th, 2018
 
 local lf_print = true -- Setup debug printing in local file
                        -- Use if lf_print then print("something") end
 
 local StringIdBase = 17764701200 -- Deposit Auto Refill  : 701200 - 701299 next: 5
 local ModDir = CurrentModPath
-local iconIAnotice = ModDir.."UI/Icons/NoticeIconBlank.png"
+local iconIAnotice = ModDir.."UI/Icons/IANotice.png"
 
 
 g_IAnoticeDismissTime = 15000 -- Notice dismiss time in msecs
@@ -36,11 +36,16 @@ local function IAaddCures()
 	end -- if not found
 end -- function IAaddCures()
 
+
 -- remove worker specialization and optionally fire worker
+-- unit          : colonist object, required
+-- fireworker    : boolean, optional, if true fire worker from job
+-- firedOfficers : table, optional, supplied for the cycled objects in the notice
 local function IAremoveSpecialization(unit, fireworker, firedOfficers)
   local specialization = unit.specialist
   local workplace = unit.workplace
 
+  -- only remove the specialty of a security officer
 	if specialization == "security" then
   	unit.city:RemoveFromLabel(unit.specialist, unit)
 	  unit:RemoveTrait(unit.specialist)
@@ -51,40 +56,48 @@ local function IAremoveSpecialization(unit, fireworker, firedOfficers)
     Msg("NewSpecialist", unit)
   end -- if specialization
 
-  local IAmsg = T{StringIdBase + 3, "Internal affairs found renegade officers"}
+  -- if table not supplied, then this function was called from the sanatorium
+  -- create the table and add the one colonist
   if not firedOfficers then
   	firedOfficers = {}
   	table.insert(firedOfficers, unit)
   end -- if not firedOfficers
+
+  local IAmsg = T{StringIdBase + 3, "Internal affairs found <numrenegades> renegade officers", numrenegades = #firedOfficers}
   AddCustomOnScreenNotification("IA_IANotice", T{StringIdBase + 4, "Internal Affairs"}, IAmsg, iconIAnotice, nil, {cycle_objs = firedOfficers, expiration = g_IAnoticeDismissTime})
 	PlayFX("UINotificationResearchComplete", unit)
 
+  -- if we need to fire the worker, check to make sure they are working first then fire
   if fireworker and workplace then workplace:FireWorker(unit) end
 end -- IAremoveSpecialization(unit)
 
+
 -- Internal affairs function called during night shift
+-- looking for renegades working in the security stations
 function IAexecuteInvestigation()
 	local secStations = UICity.labels.SecurityStation or empty_table
 	local workingStation = false
 	local fireworker = true
 	local firedOfficers = {}
 
+  -- check for at least one working SecurityStation
 	for i = 1, #secStations do
 		if secStations[i].working then workingStation = true end
 	end -- for i
 
 	if workingStation then
-	  for i = 1, #secStations do
+	  for i = 1, #secStations do -- for each Station
 	  	local workshifts = secStations[i].workers
-      for j = 1, #workshifts do
+      for j = 1, #workshifts do -- for each workshift in each station
       	local workers = workshifts[j]
-     		for k = 1, #workers do
+     		for k = 1, #workers do -- for each worker in each workshift in each station
      			if workers[k].traits.Renegade then
+            -- if worker is a renegade, track for notice and execute remove/fire code
      				table.insert(firedOfficers, workers[k])
      				IAremoveSpecialization(workers[k], fireworker, firedOfficers)
      			end -- if renegade
       	end -- for k
-      end -- for k
+      end -- for j
 	  end -- for i
 	end -- if workingStation
 

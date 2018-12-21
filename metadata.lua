@@ -1,6 +1,7 @@
 return PlaceObj('ModDef', {
 	'title', "Internal Affairs",
 	'description', "Internal Affairs\nv1.0\nBy SkiRich",
+	'image', "IALogo.png",
 	'last_changes', "v1.0",
 	'ignore_files', {
 		"*.git/*",
