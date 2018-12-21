@@ -13,6 +13,6 @@ return PlaceObj('ModDef', {
 	'author', "SkiRich",
 	'version', 4,
 	'lua_revision', 238808,
-	'code', {"Code/IA_1Init.lua","Code/IA_2Numbers.lua"},
+	'code', {"Code/IA_1Init.lua","Code/IA_2Numbers.lua","Code/IA_3ModConfig.lua"},
 	'saved', 1545356536,
 })

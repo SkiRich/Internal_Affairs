@@ -119,7 +119,7 @@ end -- IAremoveSpecialization(unit)
 
 -- Internal affairs function called during night shift
 -- looking for renegades working in the security stations
-function IAexecuteInvestigation()
+local function IAexecuteInvestigation()
 	local secStations = UICity.labels.SecurityStation or empty_table
 	local workingStation = false
 	local fireworker = true
