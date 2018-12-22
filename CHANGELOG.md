@@ -1,4 +1,15 @@
 # Changelog for Internal Affairs
+## v1.0.1 12/22/2018 2:15:49 AM
+#### Changed
+- CityStart() to NewMapLoaded()
+
+#### Added
+- Added DelayedCall for NewMapLoaded
+
+#### Fixed Issues
+- nil logged since Sanatorium traits not yet populated
+
+-------------------------------------------------
 ## 1.0 12/21/2018 2:41:56 AM
 #### Changed
 - minor code tweeks

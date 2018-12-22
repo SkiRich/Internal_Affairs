@@ -151,8 +151,10 @@ end -- IAexecuteInvestigation()
 
 -------------------------------------------- OnMsgs --------------------------------------------------
 
-function OnMsg.CityStart()
-	IAaddCures()
+function OnMsg.NewMapLoaded()
+	-- GenerateBuildingTraitLists() is called in NewMapLoaded
+  -- delay the call to give it time to load
+  DelayedCall(500, IAaddCures)
 end -- OnMsg.CityStart()
 
 
