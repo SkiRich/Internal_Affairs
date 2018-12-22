@@ -1,8 +1,8 @@
 return PlaceObj('ModDef', {
 	'title', "Internal Affairs",
-	'description', "Internal Affairs\nv1.0 Dec 21st, 2018\nBy SkiRich",
+	'description', "Internal Affairs\nv1.0.1 Dec 22nd, 2018\nBy SkiRich",
 	'image', "IALogo.png",
-	'last_changes', "v1.0 Dec 21st, 2018",
+	'last_changes', "v1.0.1 Dec 22nd, 2018",
 	'ignore_files', {
 		"*.git/*",
 		"*.svn/*",
@@ -12,10 +12,10 @@ return PlaceObj('ModDef', {
 	'id', "ccPSpkd",
 	'steam_id', "1596642938",
 	'author', "SkiRich",
-	'version', 9,
+	'version', 12,
 	'lua_revision', 238808,
 	'code', {"Code/IA_1Init.lua","Code/IA_2Numbers.lua","Code/IA_3ModConfig.lua"},
-	'saved', 1545379140,
+	'saved', 1545463213,
 	'screenshot1', "Images/IALogo.png",
 	'screenshot2', "Images/IACure.png",
 	'screenshot3', "Images/IAGameNotices.png",
