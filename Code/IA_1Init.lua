@@ -3,12 +3,12 @@
 -- All rights reserved, duplication and modification prohibited.
 -- You may not copy it, package it, or claim it as your own.
 -- Created Dec 17th, 2018
--- Updated Dec 21th, 2018
+-- Updated Sept 28th, 2021
 
 local lf_print = false -- Setup debug printing in local file
                        -- Use if lf_print then print("something") end
 
-local StringIdBase = 17764701200 -- Deposit Auto Refill  : 701200 - 701299 this file 0-49 next: 5
+local StringIdBase = 17764701200 -- Internal Affairs  : 701200 - 701299 this file 0-49 next: 5
 local ModDir = CurrentModPath
 local iconIAnotice = ModDir.."UI/Icons/IANotice.png"
 local IAtraitParolee       = "Parolee"
@@ -109,7 +109,7 @@ local function IAremoveSpecialization(unit, fireworker, firedOfficers)
   end -- if not firedOfficers
 
   local IAmsg = T{StringIdBase + 3, "Internal affairs found <numrenegades> renegade officers", numrenegades = #firedOfficers}
-  AddCustomOnScreenNotification("IA_IANotice", T{StringIdBase + 4, "Internal Affairs"}, IAmsg, iconIAnotice, nil, {cycle_objs = firedOfficers, expiration = g_IAnoticeDismissTime})
+  AddCustomOnScreenNotification("IA_IANotice", T{StringIdBase + 4, "Internal Affairs"}, IAmsg, iconIAnotice, nil, {cycle_objs = firedOfficers, expiration = g_IAnoticeDismissTime}, MainMapID)
 	PlayFX("UINotificationResearchComplete", unit)
 
   -- if we need to fire the worker, check to make sure they are working first then fire
@@ -120,7 +120,7 @@ end -- IAremoveSpecialization(unit)
 -- Internal affairs function called during night shift
 -- looking for renegades working in the security stations
 local function IAexecuteInvestigation()
-	local secStations = UICity.labels.SecurityStation or empty_table
+	local secStations = UIColony.city_labels.labels.SecurityStation or empty_table
 	local workingStation = false
 	local fireworker = true
 	local firedOfficers = {}
@@ -151,7 +151,7 @@ end -- IAexecuteInvestigation()
 
 -------------------------------------------- OnMsgs --------------------------------------------------
 
-function OnMsg.NewMapLoaded()
+function OnMsg.CityStart()
 	-- GenerateBuildingTraitLists() is called in NewMapLoaded
   -- delay the call to give it time to load
   DelayedCall(500, IAaddCures)
@@ -175,6 +175,7 @@ end -- OnMsg.ClassesPostprocess()
 
 function OnMsg.ClassesGenerate()
 
+--[[ dont need this
   -- renegades cannot train at university
   local Old_MartianUniversity_CanTrain = MartianUniversity.CanTrain
   function MartianUniversity:CanTrain(unit)
@@ -184,6 +185,8 @@ function OnMsg.ClassesGenerate()
     end -- if renegade
 	  return Old_MartianUniversity_CanTrain(self, unit)
   end --MartianUniversity:CanTrain(unit)
+]]--
+
 
   local Old_Sanatorium_CanTrain = Sanatorium.CanTrain
   function Sanatorium:CanTrain(unit)
@@ -224,7 +227,7 @@ function OnMsg.ClassesGenerate()
 
         	local colonistname = _InternalTranslate(unit.name)
         	local IAmsg = T{StringIdBase + 1, "Officer assigned to: <colonistname>", colonistname = colonistname}
-          AddCustomOnScreenNotification("IA_PONotice", T{StringIdBase + 2, "Parole Officer Assigned"}, IAmsg, iconIAnotice, nil, {cycle_objs = {unit}, expiration = g_IAnoticeDismissTime})
+          AddCustomOnScreenNotification("IA_PONotice", T{StringIdBase + 2, "Parole Officer Assigned"}, IAmsg, iconIAnotice, nil, {cycle_objs = {unit}, expiration = g_IAnoticeDismissTime}, MainMapID)
 	        PlayFX("UINotificationResearchComplete", self)
 	      end -- if not unit.IA_PO
 

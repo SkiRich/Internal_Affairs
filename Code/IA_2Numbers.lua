@@ -5,12 +5,14 @@
 -- You may not copy this mod, package this mod, or claim this mod as your own.
 -- You may use or copy this file and supporting number png files (IA_2_Numbers.lua) under the MIT license terms
 -- Created Dec 19th, 2018
--- Updated Dec 19th, 2018
+-- Updated Sept 28th, 2021
 
 local icon_8min_str = "UI/Icons/Buildings/numbers_0%s.tga"
 local icon_9_str = string.format("%sUI/Numbers/numbers_0%s.png",CurrentModPath,"%s")
 local icon_10plus_str = string.format("%sUI/Numbers/numbers_%s.png",CurrentModPath,"%s")
 
+
+-- rewrite from InfopanelItems.lua
 function FillTraitSelectorItems(object, items, traits, align, list)
   local start = #items
   for i = 1, #traits do
@@ -62,4 +64,4 @@ function FillTraitSelectorItems(object, items, traits, align, list)
     end
   end
   return align
-end
+end -- FillTraitSelectorItems(object, items, traits, align, list)
