@@ -14,7 +14,7 @@ return PlaceObj('ModDef', {
 	'pops_desktop_uuid', "75fde52e-8d56-406b-aefb-28a2571b95fa",
 	'pops_any_uuid', "1b414e5c-2808-4260-b442-8ec39a18098f",
 	'author', "SkiRich",
-	'version', 13,
+	'version', 15,
 	'lua_revision', 1007000,
 	'saved_with_revision', 1008138,
 	'code', {
@@ -22,7 +22,7 @@ return PlaceObj('ModDef', {
 		"Code/IA_2Numbers.lua",
 		"Code/IA_3ModConfig.lua",
 	},
-	'saved', 1632864033,
+	'saved', 1632866339,
 	'screenshot1', "Images/IALogo.png",
 	'screenshot2', "Images/IACure.png",
 	'screenshot3', "Images/IAGameNotices.png",
