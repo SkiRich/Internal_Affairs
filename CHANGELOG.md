@@ -1,4 +1,14 @@
 # Changelog for Internal Affairs
+## [v2.0] 09/28/21 5:19:23 PM
+#### Changed
+- Picard Version Bump
+- UICity to UIColony
+- MainMapID to notifications
+- Changed NewMapLoaded to CityStart
+- comments
+- modernized MCR
+
+--------------------------------------------------------
 ## v1.0.1 12/22/2018 2:15:49 AM
 #### Changed
 - CityStart() to NewMapLoaded()
